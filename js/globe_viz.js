@@ -36,10 +36,10 @@
         .clamp(true);
 
     // Atmosphere color — visible glow ring around the globe
-    // Combines high brightness (for CO2 fog effect) with bright red (for temperature)
+    // A dusty, pale smog color to provide white haze without being overwhelmingly red
     const atmColorScale = d3.scaleLinear()
         .domain([-0.5, 0, 0.3, 0.8, 1.2])
-        .range(["#1a4a7a", "#4a6a8a", "#aa6655", "#ee4433", "#ff7766"])
+        .range(["#1a4a7a", "#4a6a8a", "#9a8a7a", "#c0a090", "#dcb4a4"])
         .clamp(true);
 
     // CO₂ → atmosphere thickness (haziness)
@@ -150,12 +150,13 @@
         targetBase = hexToRgb(baseColorScale(tempAnomaly));
 
         // Emissive intensity: moderate for cool, stronger for warm
+        // Boosted surface red glow to compensate for the whiter atmosphere
         if (tempAnomaly >= 0) {
-            targetIntensity = 0.12 + tempAnomaly * 0.3;
+            targetIntensity = 0.12 + tempAnomaly * 0.45;
         } else {
             targetIntensity = 0.1 + Math.abs(tempAnomaly) * 0.1;
         }
-        targetIntensity = Math.min(targetIntensity, 0.5);
+        targetIntensity = Math.min(targetIntensity, 0.75);
 
         // --- Atmosphere ---
         globe.atmosphereColor(atmColorScale(tempAnomaly));
