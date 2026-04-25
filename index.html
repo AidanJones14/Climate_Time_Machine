@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Time Machine</title>
+    <meta name="description" content="Explore 140+ years of global temperature and CO2 data with an interactive 3D globe. See how our climate has changed — and what we can do about it.">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:title" content="Climate Time Machine">
+    <meta property="og:description" content="Watch 140+ years of global warming unfold on an interactive 3D Earth. Built with NASA & NOAA data.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://aidanjones14.github.io/Climate_Time_Machine/">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Favicon (Earth emoji as SVG) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+
+    <!-- D3.js for color scales and 2D charting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+
+    <!-- Globe.gl (bundles Three.js internally) -->
+    <script src="https://unpkg.com/globe.gl"></script>
+
+    <!-- Google Fonts — Inter for clean modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Project styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- Loading overlay — shown while Globe.gl initializes -->
+        <div id="loading-overlay">
+            <div id="loading-content">
+                <div id="loading-globe">🌍</div>
+                <p id="loading-text">Loading Climate Time Machine…</p>
+            </div>
+        </div>
+
+        <!-- 3D Globe renders here (full viewport background) -->
+        <div id="viz-container"></div>
+
+        <!-- Sparkline charts — left side, flanking the globe -->
+        <div id="sparklines">
+            <div id="sparkline-temp" class="sparkline-chart">
+                <div class="sparkline-label">Temperature Anomaly <span class="sparkline-unit">°C</span></div>
+                <svg id="svg-temp"></svg>
+            </div>
+            <div id="sparkline-co2" class="sparkline-chart">
+                <div class="sparkline-label">CO₂ Concentration <span class="sparkline-unit">ppm</span></div>
+                <svg id="svg-co2"></svg>
+            </div>
+        </div>
+
+        <!-- Info panel overlay — top-right corner -->
+        <div id="info-panel">
+            <h1 id="app-title">Climate Time Machine</h1>
+            <div id="year-display">
+                <span id="current-year">1880</span>
+            </div>
+            <div id="stats">
+                <div id="temp-stat" class="stat-row">
+                    <span class="stat-label">Temp. Anomaly</span>
+                    <span id="temp-value" class="stat-value">—</span>
+                </div>
+                <div id="temp-actual-stat" class="stat-row">
+                    <span class="stat-label">Est. Global Avg</span>
+                    <span id="temp-actual-value" class="stat-value">—</span>
+                </div>
+                <div id="co2-stat" class="stat-row" style="display: none;">
+                    <span class="stat-label">Atmospheric CO₂</span>
+                    <span id="co2-value" class="stat-value">—</span>
+                </div>
+            </div>
+            <div id="birth-year-section">
+                <label for="birth-year-input">Compare to your birth year</label>
+                <div id="birth-year-form">
+                    <input type="number" id="birth-year-input" min="1880" max="2023" placeholder="e.g. 2003">
+                    <button id="birth-year-btn" type="button">Go</button>
+                </div>
+                <div id="birth-year-stats" style="display: none;">
+                    <div class="birth-stat-row">
+                        <span class="birth-stat-label">🌡️ Temp change</span>
+                        <span id="birth-temp-diff" class="birth-stat-value">—</span>
+                    </div>
+                    <div class="birth-stat-row">
+                        <span class="birth-stat-label">💨 CO₂ change</span>
+                        <span id="birth-co2-diff" class="birth-stat-value">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slider controls — bottom center -->
+        <div id="controls">
+            <button id="play-btn" type="button" aria-label="Play animation">▶</button>
+            <input type="range" id="year-slider" min="1880" max="2023" value="1880" step="1">
+            <span id="slider-year-label">1880</span>
+            <button id="speed-btn" type="button" aria-label="Change playback speed" title="Playback speed">1×</button>
+        </div>
+
+        <!-- Keyboard hints — bottom-left -->
+        <div id="keyboard-hints">
+            <div class="hint-key">Space</div><span class="hint-action">Play / Pause</span>
+            <div class="hint-key">← →</div><span class="hint-action">Scrub Timeline</span>
+        </div>
+
+        <!-- Data callout & source attribution -->
+        <footer id="footer">
+            <div id="data-callout">
+                <p>"AI and software tools could reduce global emissions by <strong>3–6 gigatonnes</strong> of CO₂ per year by 2035."</p>
+                <cite>— <a href="https://www.weforum.org/stories/2025/01/artificial-intelligence-climate-transition-drive-growth/" target="_blank" rel="noopener">World Economic Forum, 2025</a></cite>
+            </div>
+            <div id="sources">
+                <p>Data:
+                    <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener">NASA GISTEMP v4</a> ·
+                    <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener">NOAA Mauna Loa CO₂</a> ·
+                    <a href="https://www.weforum.org/stories/2025/01/artificial-intelligence-climate-transition-drive-growth/" target="_blank" rel="noopener">WEF AI &amp; Climate</a>
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Scripts loaded in dependency order -->
+    <script src="js/data.js"></script>
+    <script src="js/globe_viz.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>

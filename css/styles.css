@@ -1,0 +1,667 @@
+/* ===================================================
+   Climate Time Machine — Styles
+   =================================================== */
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+    --bg-primary: #0f172a;
+    --bg-secondary: rgba(15, 23, 42, 0.75);
+    --bg-glass: rgba(15, 23, 42, 0.55);
+    --border-glass: rgba(148, 163, 184, 0.15);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent: #38bdf8;
+    --accent-glow: rgba(56, 189, 248, 0.25);
+    --temp-cold: #2166ac;
+    --temp-warm: #b2182b;
+    --co2-color: #22d3ee;
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --shadow-glow: 0 0 40px rgba(56, 189, 248, 0.08);
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    font-family: var(--font-family);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+
+/* --- Full-screen Globe Container --- */
+#viz-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* --- Info Panel (Glassmorphism Card) --- */
+/* FIXED HEIGHT: panel does not resize with content (#6) */
+#info-panel {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 10;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    padding: 24px 22px;
+    border-radius: var(--radius-lg);
+    width: 300px;
+    box-shadow: var(--shadow-glow);
+    transition: opacity var(--transition-normal);
+}
+
+#app-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- Year Display --- */
+#year-display {
+    margin: 8px 0 14px;
+}
+
+#current-year {
+    font-size: 2.8rem;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    transition: color var(--transition-normal);
+}
+
+/* --- Stats --- */
+#stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+.stat-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    transition: color var(--transition-fast);
+}
+
+.stat-value.warm {
+    color: var(--temp-warm);
+}
+
+.stat-value.cool {
+    color: var(--temp-cold);
+}
+
+.stat-value.co2 {
+    color: var(--co2-color);
+}
+
+/* --- Birth Year Section --- */
+#birth-year-section {
+    border-top: 1px solid var(--border-glass);
+    padding-top: 12px;
+}
+
+#birth-year-section label {
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 6px;
+}
+
+#birth-year-form {
+    display: flex;
+    gap: 6px;
+}
+
+#birth-year-input {
+    flex: 1;
+    padding: 7px 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+    transition: border-color var(--transition-fast);
+    /* Remove spinner arrows on number input */
+    -moz-appearance: textfield;
+}
+
+#birth-year-input::-webkit-outer-spin-button,
+#birth-year-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#birth-year-input::placeholder {
+    color: var(--text-muted);
+}
+
+#birth-year-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+#birth-year-btn {
+    padding: 7px 14px;
+    background: var(--accent);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+#birth-year-btn:hover {
+    background: #7dd3fc;
+    transform: scale(1.04);
+}
+
+#birth-year-btn:active {
+    transform: scale(0.97);
+}
+
+/* Birth year stats — structured rows like the main stats */
+#birth-year-stats {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: birthStatsIn 0.4s ease;
+}
+
+@keyframes birthStatsIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.birth-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+}
+
+.birth-stat-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+
+.birth-stat-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+}
+
+#birth-temp-diff {
+    color: var(--temp-warm);
+}
+
+#birth-co2-diff {
+    color: var(--co2-color);
+}
+
+/* --- Sparkline Charts (Left Side) --- */
+#sparklines {
+    position: fixed;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 180px;
+}
+
+.sparkline-chart {
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 12px 14px 8px;
+    box-shadow: var(--shadow-glow);
+}
+
+.sparkline-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.sparkline-unit {
+    font-weight: 400;
+    color: var(--text-muted);
+    text-transform: none;
+}
+
+.sparkline-chart svg {
+    width: 100%;
+    height: 80px;
+    display: block;
+    overflow: visible;
+}
+
+/* SVG styling for sparkline elements */
+.sparkline-baseline {
+    stroke: var(--text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    opacity: 0.4;
+}
+
+.sparkline-path {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.sparkline-dot {
+    transition: cx 60ms ease, cy 60ms ease;
+}
+
+.sparkline-value-label {
+    font-family: var(--font-family);
+    font-size: 10px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Controls Bar (Bottom Center) --- */
+#controls {
+    position: fixed;
+    bottom: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    padding: 12px 24px;
+    border-radius: 50px;
+    box-shadow: var(--shadow-glow);
+    min-width: 420px;
+}
+
+/* --- Play / Pause Button --- */
+#play-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+    line-height: 1;
+    padding-left: 2px; /* optical centering for ▶ */
+}
+
+#play-btn:hover {
+    background: var(--accent);
+    color: var(--bg-primary);
+}
+
+#play-btn:active {
+    transform: scale(0.92);
+}
+
+#play-btn.playing {
+    background: var(--accent);
+    color: var(--bg-primary);
+    padding-left: 0;
+}
+
+/* --- Custom Range Slider --- */
+#year-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: linear-gradient(to right, var(--temp-cold), var(--text-muted) 50%, var(--temp-warm));
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Webkit thumb */
+#year-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+    cursor: grab;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#year-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 16px var(--accent-glow);
+}
+
+#year-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+/* Firefox thumb */
+#year-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+    cursor: grab;
+}
+
+#year-slider::-moz-range-track {
+    height: 6px;
+    background: linear-gradient(to right, var(--temp-cold), var(--text-muted) 50%, var(--temp-warm));
+    border-radius: 3px;
+    border: none;
+}
+
+/* --- Slider Year Label --- */
+#slider-year-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    min-width: 40px;
+    text-align: right;
+}
+
+/* --- Footer --- */
+#footer {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+#footer a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+#footer a:hover {
+    color: #7dd3fc;
+}
+
+#data-callout {
+    margin-bottom: 4px;
+}
+
+#data-callout p {
+    font-style: italic;
+}
+
+#data-callout cite {
+    font-style: normal;
+}
+
+/* --- Responsive (Mobile) --- */
+@media (max-width: 768px) {
+    #info-panel {
+        top: auto;
+        bottom: 140px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        padding: 18px 14px;
+    }
+
+    #app-title {
+        font-size: 1rem;
+    }
+
+    #current-year {
+        font-size: 2rem;
+    }
+
+    #controls {
+        bottom: 80px;
+        min-width: 0;
+        width: calc(100% - 24px);
+        padding: 10px 16px;
+    }
+
+    #footer {
+        bottom: 6px;
+        font-size: 0.6rem;
+        padding: 0 12px;
+    }
+
+    #keyboard-hints {
+        display: none;
+    }
+
+    #sparklines {
+        display: none;
+    }
+}
+
+/* --- Loading Overlay --- */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+#loading-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#loading-content {
+    text-align: center;
+}
+
+#loading-globe {
+    font-size: 4rem;
+    animation: loadingSpin 2s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes loadingSpin {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+}
+
+#loading-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    animation: loadingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* --- Speed Button --- */
+#speed-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border-glass);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-family);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#speed-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+#speed-btn:active {
+    transform: scale(0.92);
+}
+
+/* --- Keyboard Hints (Issue #5 — larger icons) --- */
+#keyboard-hints {
+    position: fixed;
+    bottom: 56px;
+    left: 24px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0.7;
+    transition: opacity 1s ease;
+    animation: hintsIn 0.6s ease 1s both;
+}
+
+#keyboard-hints.faded {
+    opacity: 0;
+}
+
+.hint-key {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-glass);
+    border-radius: 6px;
+    font-family: var(--font-family);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 44px;
+    text-align: center;
+    margin-right: 8px;
+}
+
+.hint-action {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+@keyframes hintsIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 0.7; transform: translateY(0); }
+}
+
+/* --- Webkit Scrollbar for Info Panel --- */
+#info-panel::-webkit-scrollbar {
+    width: 4px;
+}
+
+#info-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#info-panel::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 2px;
+}
