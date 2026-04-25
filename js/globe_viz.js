@@ -1,56 +1,35 @@
-/**
- * globe_viz.js — Globe.gl 3D Earth visualization
- *
- * Renders an interactive 3D globe that responds to the year slider.
- *
- * Temperature effect:
- *   - Globe material BASE COLOR shifts from cool to warm tones
- *   - Globe material EMISSIVE color provides the glow tint
- *   - Combined effect: the globe clearly shifts blue → natural → RED
- *
- * CO₂ effect (post-1958):
- *   - Atmosphere color shifts warm
- *   - Atmosphere altitude grows slightly with CO₂ ppm
- *
- * Listens to the "yearchange" custom event dispatched by app.js.
- */
+// globe visualization script
 
 (function () {
     "use strict";
 
-    // =========================================================
-    //  Color Scales
-    // =========================================================
+    // color scales
 
-    // Emissive glow color — saturated red for warm, saturated blue for cool
+    // emissive glow (heat)
     const emissiveColorScale = d3.scaleLinear()
         .domain([-0.5, -0.1, 0.0, 0.3, 0.7, 1.2])
         .range(["#2166ac", "#4393c3", "#444444", "#b03020", "#8b0000", "#550000"])
         .clamp(true);
 
-    // Base material color — shifts the ENTIRE texture tone
-    // Cool = blueish grey, neutral = grey, warm = reddish/warm grey
+    // base texture tint
     const baseColorScale = d3.scaleLinear()
         .domain([-0.5, 0.0, 0.4, 0.8, 1.2])
         .range(["#8899bb", "#aaaaaa", "#bb9988", "#cc7766", "#aa4444"])
         .clamp(true);
 
-    // Atmosphere color — visible glow ring around the globe
-    // A dusty, pale smog color to provide white haze without being overwhelmingly red
+    // atmosphere halo color
     const atmColorScale = d3.scaleLinear()
         .domain([-0.5, 0, 0.3, 0.8, 1.2])
         .range(["#1a4a7a", "#4a6a8a", "#9a8a7a", "#c0a090", "#dcb4a4"])
         .clamp(true);
 
-    // CO₂ → atmosphere thickness (haziness)
+    // atmosphere thickness (co2)
     const co2AltitudeScale = d3.scaleLinear()
         .domain([315, 370, 425])
         .range([0.15, 0.25, 0.60])
         .clamp(true);
 
-    // =========================================================
-    //  Globe Initialization
-    // =========================================================
+    // initialize globe
     const container = document.getElementById("viz-container");
 
     const globe = new Globe(container, {
@@ -65,20 +44,16 @@
         .atmosphereAltitude(0.10)
         .pointOfView({ lat: 20, lng: -40, altitude: 2.2 });
 
-    // =========================================================
-    //  Globe Material — THREE.js MeshPhongMaterial
-    // =========================================================
+    // globe material config
     const globeMaterial = globe.globeMaterial();
 
-    // Start with neutral-cool base
+    // initial neutral state
     globeMaterial.color.set(0x8899bb);
     globeMaterial.emissive.set(0x2166ac);
     globeMaterial.emissiveIntensity = 0.12;
     globeMaterial.shininess = 8;
 
-    // =========================================================
-    //  Auto-rotation
-    // =========================================================
+    // camera controls
     const controls = globe.controls();
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.4;
@@ -86,9 +61,7 @@
     controls.minDistance = 150;
     controls.maxDistance = 500;
 
-    // =========================================================
-    //  Smooth Transition State
-    // =========================================================
+    // animation state
     let targetEmissive = { r: 0.13, g: 0.40, b: 0.67 };
     let currentEmissive = { ...targetEmissive };
     let targetBase = { r: 0.53, g: 0.60, b: 0.73 };
@@ -109,25 +82,23 @@
         return a + (b - a) * t;
     }
 
-    // =========================================================
-    //  Animation Loop — smooth interpolation each frame
-    // =========================================================
+    // render loop
     const LERP_SPEED = 0.06;
 
     function animate() {
-        // Smoothly interpolate emissive color
+        // smooth color updates
         currentEmissive.r = lerp(currentEmissive.r, targetEmissive.r, LERP_SPEED);
         currentEmissive.g = lerp(currentEmissive.g, targetEmissive.g, LERP_SPEED);
         currentEmissive.b = lerp(currentEmissive.b, targetEmissive.b, LERP_SPEED);
         globeMaterial.emissive.setRGB(currentEmissive.r, currentEmissive.g, currentEmissive.b);
 
-        // Smoothly interpolate base color
+
         currentBase.r = lerp(currentBase.r, targetBase.r, LERP_SPEED);
         currentBase.g = lerp(currentBase.g, targetBase.g, LERP_SPEED);
         currentBase.b = lerp(currentBase.b, targetBase.b, LERP_SPEED);
         globeMaterial.color.setRGB(currentBase.r, currentBase.g, currentBase.b);
 
-        // Smoothly interpolate emissive intensity
+
         currentIntensity = lerp(currentIntensity, targetIntensity, LERP_SPEED);
         globeMaterial.emissiveIntensity = currentIntensity;
 
@@ -136,21 +107,18 @@
 
     animate();
 
-    // =========================================================
-    //  Year Change Handler
-    // =========================================================
+    // listen for year updates
     window.addEventListener("yearchange", (e) => {
         const { year, tempAnomaly, co2 } = e.detail;
         if (tempAnomaly === undefined) return;
 
-        // --- Temperature → Emissive glow ---
+        // target colors based on temp
         targetEmissive = hexToRgb(emissiveColorScale(tempAnomaly));
 
-        // --- Temperature → Base material color (tints the texture) ---
+
         targetBase = hexToRgb(baseColorScale(tempAnomaly));
 
-        // Emissive intensity: moderate for cool, stronger for warm
-        // Boosted surface red glow to compensate for the whiter atmosphere
+        // adjust glow intensity
         if (tempAnomaly >= 0) {
             targetIntensity = 0.12 + tempAnomaly * 0.45;
         } else {
@@ -158,7 +126,7 @@
         }
         targetIntensity = Math.min(targetIntensity, 0.75);
 
-        // --- Atmosphere ---
+        // update atmosphere
         globe.atmosphereColor(atmColorScale(tempAnomaly));
 
         if (co2 !== undefined) {
@@ -171,17 +139,13 @@
         }
     });
 
-    // =========================================================
-    //  Handle Window Resize
-    // =========================================================
+    // handle resize
     window.addEventListener("resize", () => {
         globe.width(container.clientWidth);
         globe.height(container.clientHeight);
     });
 
-    // =========================================================
-    //  Notify app.js when globe is ready
-    // =========================================================
+    // notify app when ready
     globe.onGlobeReady(() => {
         console.log("Globe texture loaded — dispatching globeready");
         window.dispatchEvent(new Event("globeready"));

@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """
-build.py — Bundle the Climate Time Machine into a single index.html file.
-
-Reads the separate CSS, JS data, globe_viz, and app files, then inlines them
-into index.html by replacing the external <link>/<script> references with
-<style> and <script> blocks.
-
-Usage:
-    python scripts/build.py
-
-Output:
-    dist/index.html — single self-contained file ready for GitHub Pages
+build.py - Bundle the project into a single index.html file.
 """
 
 import os

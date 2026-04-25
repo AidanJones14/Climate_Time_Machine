@@ -1,8 +1,6 @@
-/* ===================================================
-   Climate Time Machine — Styles
-   =================================================== */
+/* climate time machine styles */
 
-/* --- CSS Custom Properties (Design Tokens) --- */
+/* variables */
 :root {
     --bg-primary: #0f172a;
     --bg-secondary: rgba(15, 23, 42, 0.75);
@@ -26,7 +24,7 @@
     --transition-slow: 500ms ease;
 }
 
-/* --- Reset & Base --- */
+/* reset */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -42,7 +40,7 @@ html, body {
     width: 100%;
 }
 
-/* --- Full-screen Globe Container --- */
+/* full-screen globe container */
 #viz-container {
     position: fixed;
     top: 0;
@@ -52,8 +50,8 @@ html, body {
     z-index: 0;
 }
 
-/* --- Info Panel (Glassmorphism Card) --- */
-/* FIXED HEIGHT: panel does not resize with content (#6) */
+/* info panel */
+/* fixed height so it doesn't resize with content */
 #info-panel {
     position: fixed;
     top: 24px;
@@ -81,7 +79,7 @@ html, body {
     background-clip: text;
 }
 
-/* --- Year Display --- */
+/* year display */
 #year-display {
     margin: 8px 0 14px;
 }
@@ -96,7 +94,7 @@ html, body {
     transition: color var(--transition-normal);
 }
 
-/* --- Stats --- */
+/* stats */
 #stats {
     display: flex;
     flex-direction: column;
@@ -142,7 +140,7 @@ html, body {
     color: var(--co2-color);
 }
 
-/* --- Birth Year Section --- */
+/* birth year section */
 #birth-year-section {
     border-top: 1px solid var(--border-glass);
     padding-top: 12px;
@@ -175,7 +173,7 @@ html, body {
     font-variant-numeric: tabular-nums;
     outline: none;
     transition: border-color var(--transition-fast);
-    /* Remove spinner arrows on number input */
+    /* remove spinner arrows on number input */
     -moz-appearance: textfield;
 }
 
@@ -216,7 +214,7 @@ html, body {
     transform: scale(0.97);
 }
 
-/* Birth year stats — structured rows like the main stats */
+/* birth year stats */
 #birth-year-stats {
     margin-top: 8px;
     display: flex;
@@ -265,7 +263,7 @@ html, body {
     color: var(--co2-color);
 }
 
-/* --- Sparkline Charts (Left Side) --- */
+/* sparkline charts */
 #sparklines {
     position: fixed;
     left: 24px;
@@ -310,7 +308,7 @@ html, body {
     overflow: visible;
 }
 
-/* SVG styling for sparkline elements */
+/* svg styles */
 .sparkline-baseline {
     stroke: var(--text-muted);
     stroke-width: 1;
@@ -336,7 +334,7 @@ html, body {
     font-variant-numeric: tabular-nums;
 }
 
-/* --- Controls Bar (Bottom Center) --- */
+/* bottom controls */
 #controls {
     position: fixed;
     bottom: 56px;
@@ -356,7 +354,7 @@ html, body {
     min-width: 420px;
 }
 
-/* --- Play / Pause Button --- */
+/* play / pause button */
 #play-btn {
     width: 40px;
     height: 40px;
@@ -390,7 +388,7 @@ html, body {
     padding-left: 0;
 }
 
-/* --- Custom Range Slider --- */
+/* custom range slider */
 #year-slider {
     flex: 1;
     -webkit-appearance: none;
@@ -402,7 +400,7 @@ html, body {
     cursor: pointer;
 }
 
-/* Webkit thumb */
+/* webkit thumb */
 #year-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -426,7 +424,7 @@ html, body {
     transform: scale(1.1);
 }
 
-/* Firefox thumb */
+/* firefox thumb */
 #year-slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -444,7 +442,7 @@ html, body {
     border: none;
 }
 
-/* --- Slider Year Label --- */
+/* slider year label */
 #slider-year-label {
     font-size: 0.85rem;
     font-weight: 600;
@@ -454,7 +452,7 @@ html, body {
     text-align: right;
 }
 
-/* --- Footer --- */
+/* footer */
 #footer {
     position: fixed;
     bottom: 10px;
@@ -490,7 +488,7 @@ html, body {
     font-style: normal;
 }
 
-/* --- Responsive (Mobile) --- */
+/* mobile responsive */
 @media (max-width: 768px) {
     #info-panel {
         top: auto;
@@ -531,7 +529,7 @@ html, body {
     }
 }
 
-/* --- Loading Overlay --- */
+/* loading overlay */
 #loading-overlay {
     position: fixed;
     top: 0;
@@ -580,7 +578,7 @@ html, body {
     50% { opacity: 1; }
 }
 
-/* --- Speed Button --- */
+/* speed button */
 #speed-btn {
     width: 36px;
     height: 36px;
@@ -608,7 +606,7 @@ html, body {
     transform: scale(0.92);
 }
 
-/* --- Keyboard Hints (Issue #5 — larger icons) --- */
+/* keyboard hints */
 #keyboard-hints {
     position: fixed;
     bottom: 56px;
@@ -652,7 +650,7 @@ html, body {
     to { opacity: 0.7; transform: translateY(0); }
 }
 
-/* --- Webkit Scrollbar for Info Panel --- */
+/* scrollbar */
 #info-panel::-webkit-scrollbar {
     width: 4px;
 }

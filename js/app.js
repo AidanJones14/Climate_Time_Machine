@@ -1,30 +1,10 @@
-/**
- * app.js — UI logic, slider events, sparklines, and DOM updates
- *
- * Responsibilities:
- * - Wire up the year slider and play/pause controls
- * - Update the info panel (temp, CO2) on year change
- * - Handle the birth year feature (fixed: #4)
- * - Render D3 sparkline charts for temp + CO2 (#1)
- * - Speed control for playback (1×, 2×, 4×)
- * - Loading overlay dismissal
- * - Dispatch a custom event that globe_viz.js can listen to
- */
-
-(function () {
-    "use strict";
-
-    // =========================================================
-    //  Constants
-    // =========================================================
+// setup constants
     // NASA GISTEMP uses 1951-1980 baseline. Average global temp
     // during that period was approximately 14.0°C (57.2°F).
     // Source: NASA GISS FAQ
     const BASELINE_TEMP_C = 14.0;
 
-    // =========================================================
-    //  DOM References
-    // =========================================================
+    // dom elements
     const slider = document.getElementById("year-slider");
     const playBtn = document.getElementById("play-btn");
     const speedBtn = document.getElementById("speed-btn");
@@ -42,9 +22,7 @@
     const loadingOverlay = document.getElementById("loading-overlay");
     const keyboardHints = document.getElementById("keyboard-hints");
 
-    // =========================================================
-    //  State
-    // =========================================================
+    // state variables
     let currentYear = 1880;
     let isPlaying = false;
     let playInterval = null;
@@ -62,21 +40,14 @@
     const maxYear = TEMP_DATA[TEMP_DATA.length - 1].year;
     slider.max = maxYear;
 
-    // =========================================================
-    //  Data Lookup Helpers
-    // =========================================================
+    // lookup maps for quick data access
     const tempByYear = {};
     TEMP_DATA.forEach((d) => (tempByYear[d.year] = d.mean));
 
     const co2ByYear = {};
     CO2_DATA.forEach((d) => (co2ByYear[d.year] = d.co2));
 
-    // =========================================================
-    //  Sparkline Charts (Issue #1)
-    //  Two vertical charts on the left: temp anomaly + CO₂
-    //  Shows a line from min year → max year with a baseline
-    //  and a moving dot for the current year.
-    // =========================================================
+    // sparkline charts setup
     const SPARK_W = 240;
     const SPARK_H = 120;
     const SPARK_PAD = { top: 12, right: 12, bottom: 16, left: 12 };
@@ -100,7 +71,7 @@
             .domain([yMin, yMax])
             .range([SPARK_PAD.top + innerH, SPARK_PAD.top]);
 
-        // Baseline dashed line
+        // dashed baseline
         svg.append("line")
             .attr("class", "sparkline-baseline")
             .attr("x1", SPARK_PAD.left)
@@ -130,7 +101,7 @@
             .attr("stroke", color)
             .attr("d", line);
 
-        // Moving dot (current year indicator)
+        // current year dot
         const dot = svg.append("circle")
             .attr("class", "sparkline-dot")
             .attr("r", 3.5)
@@ -138,7 +109,7 @@
             .attr("stroke", "#0f172a")
             .attr("stroke-width", 1.5);
 
-        // Value label near the dot
+        // label next to dot
         const valueLabel = svg.append("text")
             .attr("class", "sparkline-value-label")
             .attr("fill", color)
@@ -148,12 +119,12 @@
         return { xScale, yScale, yKey, dot, valueLabel, labelSuffix };
     }
 
-    // Build temperature sparkline (baseline = 0°C anomaly)
+    // initialize temp sparkline
     const tempSparkline = buildSparkline(
         "svg-temp", TEMP_DATA, "mean", 0, "#ef4444", "°C"
     );
 
-    // Build CO₂ sparkline (baseline = 315 ppm, 1958 start)
+    // initialize co2 sparkline
     const co2Sparkline = buildSparkline(
         "svg-co2", CO2_DATA, "co2", 315, "#22d3ee", ""
     );
@@ -178,16 +149,14 @@
             .text(label);
     }
 
-    // =========================================================
-    //  Year Change Handler
-    // =========================================================
+    // update everything when year changes
     function setYear(year) {
         currentYear = year;
         slider.value = year;
         sliderYearLabel.textContent = year;
         currentYearEl.textContent = year;
 
-        // --- Temperature Anomaly ---
+        // update temp anomaly
         const tempAnomaly = tempByYear[year];
         if (tempAnomaly !== undefined) {
             const sign = tempAnomaly >= 0 ? "+" : "";
@@ -203,7 +172,7 @@
             tempActualEl.textContent = "—";
         }
 
-        // --- CO2 ---
+        // update co2
         const co2 = co2ByYear[year];
         if (co2 !== undefined) {
             co2StatEl.style.display = "";
@@ -213,7 +182,7 @@
             co2StatEl.style.display = "none";
         }
 
-        // --- Birth Year Comparison (#4 — fixed) ---
+        // handle birth year tool
         if (birthYear !== null) {
             const label = document.querySelector("#birth-year-section label");
             if (label) {
@@ -238,14 +207,14 @@
                     const sign = diff > 0 ? "+" : (diff < 0 ? "" : "+");
                     birthCo2Diff.textContent = `${sign}${diff.toFixed(1)} ppm`;
                 } else if (birthCo2 === undefined && currentCo2 !== undefined) {
-                    // If born before 1958 but scrubbing in modern times, CO2 baseline is missing
+                    // no baseline data for early years
                     birthCo2Diff.textContent = "No data for " + birthYear;
                 } else {
                     birthCo2Diff.textContent = "N/A";
                 }
                 birthYearStats.style.display = "flex";
             } else {
-                // Current year is before birth year
+                // hide stats if slider is before birth year
                 birthTempDiff.textContent = "—";
                 birthCo2Diff.textContent = "—";
                 birthYearStats.style.display = "flex";
@@ -254,28 +223,24 @@
             birthYearStats.style.display = "none";
         }
 
-        // --- Update sparklines ---
+        // update charts
         updateSparkline(tempSparkline, year, tempAnomaly);
         if (co2 !== undefined) {
             updateSparkline(co2Sparkline, year, co2);
         }
 
-        // --- Dispatch custom event for globe_viz.js ---
+        // tell globe to update
         window.dispatchEvent(
             new CustomEvent("yearchange", { detail: { year, tempAnomaly, co2 } })
         );
     }
 
-    // =========================================================
-    //  Slider Events
-    // =========================================================
+    // slider listener
     slider.addEventListener("input", (e) => {
         setYear(parseInt(e.target.value, 10));
     });
 
-    // =========================================================
-    //  Play / Pause
-    // =========================================================
+    // playback controls
     function startPlay() {
         isPlaying = true;
         playBtn.textContent = "⏸";
@@ -307,9 +272,7 @@
         }
     });
 
-    // =========================================================
-    //  Speed Control
-    // =========================================================
+    // speed toggle
     speedBtn.addEventListener("click", () => {
         speedIndex = (speedIndex + 1) % SPEEDS.length;
         speedBtn.textContent = SPEEDS[speedIndex].label;
@@ -320,15 +283,13 @@
         }
     });
 
-    // =========================================================
-    //  Birth Year (Issue #4 — fixed input handling)
-    // =========================================================
+    // birth year submit logic
     function submitBirthYear() {
         const raw = birthYearInput.value.trim();
         const val = parseInt(raw, 10);
 
         if (raw === "" || isNaN(val) || val < 1880 || val > maxYear) {
-            // Visual error feedback
+            // highlight input on error
             birthYearInput.style.borderColor = "var(--temp-warm)";
             birthYearInput.style.boxShadow = "0 0 0 2px rgba(178,24,43,0.3)";
             setTimeout(() => {
@@ -340,12 +301,10 @@
 
         birthYear = val;
 
-        // Jump to their birth year so they can see what the globe looked like then.
-        // As they press play or scrub forward, the setYear function will update the
-        // "Comparing YYYY to ZZZZ" label and show the accumulating differences.
+        // jump to birth year
         setYear(birthYear);
         
-        // Optional: briefly flash the play button to hint what to do next
+        // flash play button
         playBtn.style.transform = "scale(1.2)";
         playBtn.style.boxShadow = "0 0 15px var(--accent)";
         setTimeout(() => {
@@ -362,9 +321,7 @@
         }
     });
 
-    // =========================================================
-    //  Keyboard Shortcuts
-    // =========================================================
+    // keyboard shortcuts
     document.addEventListener("keydown", (e) => {
         if (e.target.tagName === "INPUT") return;
 
@@ -384,9 +341,7 @@
         }
     });
 
-    // =========================================================
-    //  Loading Overlay — dismiss after globe is ready
-    // =========================================================
+    // hide loading overlay
     function dismissLoading() {
         if (loadingOverlay) {
             loadingOverlay.classList.add("hidden");
@@ -399,18 +354,14 @@
     window.addEventListener("globeready", dismissLoading);
     setTimeout(dismissLoading, 4000);
 
-    // =========================================================
-    //  Keyboard Hints — auto-fade after 8 seconds
-    // =========================================================
+    // fade hints out after 8s
     if (keyboardHints) {
         setTimeout(() => {
             keyboardHints.classList.add("faded");
         }, 8000);
     }
 
-    // =========================================================
-    //  Initialize
-    // =========================================================
+    // initial load
     setYear(1880);
     console.log("app.js initialized");
 })();
