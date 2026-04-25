@@ -86,21 +86,22 @@
     const LERP_SPEED = 0.06;
 
     function animate() {
-        // smooth color updates
-        currentEmissive.r = lerp(currentEmissive.r, targetEmissive.r, LERP_SPEED);
-        currentEmissive.g = lerp(currentEmissive.g, targetEmissive.g, LERP_SPEED);
-        currentEmissive.b = lerp(currentEmissive.b, targetEmissive.b, LERP_SPEED);
-        globeMaterial.emissive.setRGB(currentEmissive.r, currentEmissive.g, currentEmissive.b);
+        const material = globe.globeMaterial();
+        if (material && material.color) {
+            // smooth color updates
+            currentEmissive.r = lerp(currentEmissive.r, targetEmissive.r, LERP_SPEED);
+            currentEmissive.g = lerp(currentEmissive.g, targetEmissive.g, LERP_SPEED);
+            currentEmissive.b = lerp(currentEmissive.b, targetEmissive.b, LERP_SPEED);
+            material.emissive.setRGB(currentEmissive.r, currentEmissive.g, currentEmissive.b);
 
+            currentBase.r = lerp(currentBase.r, targetBase.r, LERP_SPEED);
+            currentBase.g = lerp(currentBase.g, targetBase.g, LERP_SPEED);
+            currentBase.b = lerp(currentBase.b, targetBase.b, LERP_SPEED);
+            material.color.setRGB(currentBase.r, currentBase.g, currentBase.b);
 
-        currentBase.r = lerp(currentBase.r, targetBase.r, LERP_SPEED);
-        currentBase.g = lerp(currentBase.g, targetBase.g, LERP_SPEED);
-        currentBase.b = lerp(currentBase.b, targetBase.b, LERP_SPEED);
-        globeMaterial.color.setRGB(currentBase.r, currentBase.g, currentBase.b);
-
-
-        currentIntensity = lerp(currentIntensity, targetIntensity, LERP_SPEED);
-        globeMaterial.emissiveIntensity = currentIntensity;
+            currentIntensity = lerp(currentIntensity, targetIntensity, LERP_SPEED);
+            material.emissiveIntensity = currentIntensity;
+        }
 
         requestAnimationFrame(animate);
     }
