@@ -35,10 +35,11 @@
         .range(["#8899bb", "#aaaaaa", "#bb9988", "#cc7766", "#aa4444"])
         .clamp(true);
 
-    // Atmosphere color — visible glow ring around the globe (shifts to foggy/hazy white at high CO2)
+    // Atmosphere color — visible glow ring around the globe
+    // Combines high brightness (for CO2 fog effect) with bright red (for temperature)
     const atmColorScale = d3.scaleLinear()
         .domain([-0.5, 0, 0.3, 0.8, 1.2])
-        .range(["#1a4a7a", "#4a6a8a", "#888877", "#bbaa99", "#e0d0c0"])
+        .range(["#1a4a7a", "#4a6a8a", "#aa6655", "#ee4433", "#ff7766"])
         .clamp(true);
 
     // CO₂ → atmosphere thickness (haziness)
