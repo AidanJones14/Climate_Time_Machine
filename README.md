@@ -40,15 +40,6 @@ cd Climate_Time_Machine
 open index.html
 ```
 
-## Build Process
-
-If you modify the source files and want to generate the single-file distribution bundle:
-
-```bash
-python3 scripts/build.py
-```
-This script reads the CSS and JS files and inlines them into `dist/index.html`, creating a single, self-contained file.
-
 ## Project Structure
 
 ```
