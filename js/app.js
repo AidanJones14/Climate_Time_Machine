@@ -215,12 +215,17 @@
 
         // --- Birth Year Comparison (#4 — fixed) ---
         if (birthYear !== null) {
+            const label = document.querySelector("#birth-year-section label");
+            if (label) {
+                label.textContent = `Comparing ${birthYear} to ${year}`;
+            }
+
             if (year >= birthYear) {
                 const birthTemp = tempByYear[birthYear];
                 const currentTemp = tempByYear[year];
                 if (birthTemp !== undefined && currentTemp !== undefined) {
                     const tempDiff = currentTemp - birthTemp;
-                    const sign = tempDiff >= 0 ? "+" : "";
+                    const sign = tempDiff > 0 ? "+" : (tempDiff < 0 ? "" : "+");
                     birthTempDiff.textContent = `${sign}${tempDiff.toFixed(2)}°C`;
                 } else {
                     birthTempDiff.textContent = "—";
@@ -230,17 +235,20 @@
                 const currentCo2 = co2ByYear[year];
                 if (birthCo2 !== undefined && currentCo2 !== undefined) {
                     const diff = currentCo2 - birthCo2;
-                    const sign = diff >= 0 ? "+" : "";
+                    const sign = diff > 0 ? "+" : (diff < 0 ? "" : "+");
                     birthCo2Diff.textContent = `${sign}${diff.toFixed(1)} ppm`;
+                } else if (birthCo2 === undefined && currentCo2 !== undefined) {
+                    // If born before 1958 but scrubbing in modern times, CO2 baseline is missing
+                    birthCo2Diff.textContent = "No data for " + birthYear;
                 } else {
                     birthCo2Diff.textContent = "N/A";
                 }
-                birthYearStats.style.display = "";
+                birthYearStats.style.display = "flex";
             } else {
                 // Current year is before birth year
                 birthTempDiff.textContent = "—";
                 birthCo2Diff.textContent = "—";
-                birthYearStats.style.display = "";
+                birthYearStats.style.display = "flex";
             }
         } else {
             birthYearStats.style.display = "none";
@@ -332,19 +340,18 @@
 
         birthYear = val;
 
-        // Update the label to show which year is being compared
-        const label = document.querySelector("#birth-year-section label");
-        if (label) {
-            label.textContent = `Comparing to ${birthYear}`;
-        }
-
-        // UX Fix: If the user is at a year before their birth year (e.g. 1880), 
-        // the stats would show "—". Auto-jump to the present day so they see actual data!
-        if (currentYear <= birthYear) {
-            setYear(maxYear);
-        } else {
-            setYear(currentYear); // refresh display with birth comparison
-        }
+        // Jump to their birth year so they can see what the globe looked like then.
+        // As they press play or scrub forward, the setYear function will update the
+        // "Comparing YYYY to ZZZZ" label and show the accumulating differences.
+        setYear(birthYear);
+        
+        // Optional: briefly flash the play button to hint what to do next
+        playBtn.style.transform = "scale(1.2)";
+        playBtn.style.boxShadow = "0 0 15px var(--accent)";
+        setTimeout(() => {
+            playBtn.style.transform = "";
+            playBtn.style.boxShadow = "";
+        }, 1000);
     }
 
     birthYearBtn.addEventListener("click", submitBirthYear);
