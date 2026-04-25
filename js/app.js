@@ -77,9 +77,9 @@
     //  Shows a line from min year → max year with a baseline
     //  and a moving dot for the current year.
     // =========================================================
-    const SPARK_W = 152;
-    const SPARK_H = 80;
-    const SPARK_PAD = { top: 8, right: 8, bottom: 14, left: 8 };
+    const SPARK_W = 240;
+    const SPARK_H = 120;
+    const SPARK_PAD = { top: 12, right: 12, bottom: 16, left: 12 };
     const innerW = SPARK_W - SPARK_PAD.left - SPARK_PAD.right;
     const innerH = SPARK_H - SPARK_PAD.top - SPARK_PAD.bottom;
 
@@ -338,7 +338,13 @@
             label.textContent = `Comparing to ${birthYear}`;
         }
 
-        setYear(currentYear); // refresh display with birth comparison
+        // UX Fix: If the user is at a year before their birth year (e.g. 1880), 
+        // the stats would show "—". Auto-jump to the present day so they see actual data!
+        if (currentYear <= birthYear) {
+            setYear(maxYear);
+        } else {
+            setYear(currentYear); // refresh display with birth comparison
+        }
     }
 
     birthYearBtn.addEventListener("click", submitBirthYear);
