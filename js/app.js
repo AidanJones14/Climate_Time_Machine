@@ -1,4 +1,7 @@
 // setup constants
+(function () {
+    "use strict";
+
     // NASA GISTEMP uses 1951-1980 baseline. Average global temp
     // during that period was approximately 14.0°C (57.2°F).
     // Source: NASA GISS FAQ
