@@ -8,7 +8,7 @@ An interactive 3D data visualization that allows you to scrub through over 140 y
 
 - **3D Interactive Globe**: Globe.gl renders a spinning Earth with dynamic coloring and atmospheric effects.
 - **Temperature Visualization**: The globe's surface color shifts to red based on NASA GISTEMP data to visualize temperature anomalies.
-- **CO2 Atmospheric Effect**: The atmosphere thickens and shifts to a white smog post-1958 as CO2 concentrations rise.
+- **CO2 Atmospheric Effect**: The atmosphere thickens and shifts to a white smog post-1958 (when the data starts for CO2 concentration) as CO2 concentrations rise.
 - **Timeline Scrubbing**: Drag the slider or press play to animate through the years 1880-2023.
 - **Sparkline Charts**: D3.js powered charts provide a 2D overview of temperature and CO2 trends.
 - **Birth Year Tool**: Enter your birth year to automatically calculate and visualize the climate changes that have occurred during your lifetime.
